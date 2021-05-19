@@ -1,0 +1,85 @@
+if (isModule.toBoolean()){
+    apply plugin: 'com.android.application'
+}else{
+    apply plugin: 'com.android.library'
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        if (isModule.toBoolean()) {
+            applicationId "com.fenght.baselibrary"
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        if (isModule.toBoolean()) {
+
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME :project.getName() ]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+    sourceSets {
+        main {
+            //控制两种模式下的资源和代码配置情况
+            if (isModule.toBoolean()) {
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+            } else {
+                manifest.srcFile 'src/main/module/AndroidManifest.xml'
+                java.srcDirs = ['src/main/java', 'src/main/module/java']
+                res.srcDirs = ['src/main/res', 'src/main/module/res']
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //把implementation 用api代替,它是对外部公开的, 所有其他的module就不需要添加该依赖
+    api rootProject.ext.dependencies["appcompat"]
+    api rootProject.ext.dependencies["constraintlayout"]
+    api rootProject.ext.dependencies["junit"]
+    api rootProject.ext.dependencies["runner"]
+    api rootProject.ext.dependencies["espresso_core"]
+    //注释处理器，butterknife所必需
+    api rootProject.ext.dependencies["support_annotations"]
+
+    //MultiDex分包方法
+    api rootProject.ext.dependencies["multidex"]
+
+    //Material design
+    api rootProject.ext.dependencies["design"]
+
+    //黄油刀
+    api rootProject.ext.dependencies["butterknife"]
+    annotationProcessor rootProject.ext.dependencies["butterknife_compiler"]
+
+    //Arouter路由
+    annotationProcessor rootProject.ext.dependencies["arouter_compiler"]
+    api rootProject.ext.dependencies["arouter_api"]
+    api rootProject.ext.dependencies["arouter_annotation"]
+}

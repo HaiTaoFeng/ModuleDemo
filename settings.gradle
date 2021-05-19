@@ -1,0 +1,4 @@
+include ':corelibrary'
+include ':baselibrary'
+include ':app'
+rootProject.name = "ModuleDemo"
